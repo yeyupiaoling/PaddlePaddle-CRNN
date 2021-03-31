@@ -94,7 +94,6 @@ def evaluate(model, test_loader, vocabulary):
             label_str = label_to_string(label, vocabulary)
             labelss.append(label_str)
         for out_string, label in zip(*(out_strings, labelss)):
-            print("%s -----> %s" % (label, out_string))
             # 计算字错率
             c = cer(out_string, label) / float(len(label))
             cer_result.append(c)
