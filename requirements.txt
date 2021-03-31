@@ -1,0 +1,7 @@
+paddlepaddle-gpu>=2.0.1
+opencv-python>=4.5.1.48
+numpy>=1.19.2
+pillow>=8.1.2
+visualdl>=2.1.1
+tqdm>=4.59.0
+Levenshtein

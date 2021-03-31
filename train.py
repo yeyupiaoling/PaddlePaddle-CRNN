@@ -50,8 +50,7 @@ def train():
         for batch_id, (inputs, labels, input_lengths, label_lengths) in enumerate(train_loader()):
             out = model(inputs)
             # 计算损失
-            input_lengths = input_lengths // 4 + 1
-            # input_lengths = paddle.full(shape=[batch_size], fill_value=out.shape[0], dtype='int64')
+            input_lengths = paddle.full(shape=[batch_size], fill_value=out.shape[0], dtype='int64')
             loss = ctc_loss(out, labels, input_lengths, label_lengths)
             loss.backward()
             optimizer.step()
