@@ -26,7 +26,7 @@ def str_Q2B(ustring):
 
 def modify_ch(label):
     # 全角 -> 半角
-    # label = str_Q2B(label)
+    label = str_Q2B(label)
     # 繁体 -> 简体
     # label = Converter("zh-hans").convert(label)
 

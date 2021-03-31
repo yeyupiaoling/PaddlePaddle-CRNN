@@ -78,7 +78,7 @@ def data_enhance(img):
 
 
 # 图像预处理
-def process(path, img_width, img_height, is_data_enhance=True):
+def process(path, img_height, is_data_enhance=True):
     image = Image.open(path)
     if image.mode != 'RGB':
         image = image.convert('RGB')
@@ -90,33 +90,23 @@ def process(path, img_width, img_height, is_data_enhance=True):
     h, w = image.shape
     r = h / img_height
     width = int(w / r)
-    if w < img_width:
-        # 统一缩放大小
-        image = cv2.resize(image, (width, img_height))
-        image_temp = np.zeros((img_height, img_width - width))
-        image = np.hstack((image, image_temp))
-        image_length = w
-    else:
-        image = cv2.resize(image, (img_width, img_height))
-        image_length = img_width
+    # 缩放统一高度
+    image = cv2.resize(image, (width, img_height))
     # 转换成CHW
     image = image[np.newaxis, :]
     # 归一化
     image = (image - 128) / 128
-    return image, image_length
+    return image
 
 
 # 数据加载器
 class CustomDataset(Dataset):
-    def __init__(self, data_list_path, voc_path, img_width=1000, img_height=32, max_label_length=100,
-                 is_data_enhance=True):
+    def __init__(self, data_list_path, voc_path, img_height=32, is_data_enhance=True):
         """
         数据加载器
         :param data_list_path: 数据列表路径
         :param voc_path: 词汇表路径
-        :param img_width: 固定图片的宽度
         :param img_height: 固定图片的高度
-        :param max_label_length: 固定标签的长度
         """
         super(CustomDataset, self).__init__()
         with open(data_list_path, 'r', encoding='utf-8') as f:
@@ -125,28 +115,50 @@ class CustomDataset(Dataset):
             labels = f.readlines()
         self.vocabulary = [labels[i].replace('\n', '') for i in range(len(labels))]
         self.vocabulary_dict = dict([(labels[i].replace('\n', ''), i) for i in range(len(labels))])
-        self.img_width = img_width
         self.img_height = img_height
-        self.max_label_length = max_label_length
         self.is_data_enhance = is_data_enhance
 
     def __getitem__(self, idx):
         path, label = self.lines[idx].replace('\n', '').split('\t')
-        img, img_length = process(path, self.img_width, self.img_height, self.is_data_enhance)
-        img_length = np.array(img_length, dtype='int64')
+        img = process(path, self.img_height, self.is_data_enhance)
         # 将字符标签转换为int数据
         transcript = [self.vocabulary_dict.get(x) for x in label]
         img = np.array(img, dtype='float32')
         # 标签变长
         transcript = np.array(transcript, dtype='int32')
-        label_length = np.array(len(transcript), dtype='int64')
-        # 固定标签长度
-        if len(transcript) < self.max_label_length:
-            zeros = np.zeros(self.max_label_length - len(transcript), dtype='int32')
-            transcript = np.hstack((transcript, zeros))
-        else:
-            transcript = transcript[:self.max_label_length]
-        return img, transcript, img_length, label_length
+        return img, transcript
 
     def __len__(self):
         return len(self.lines)
+
+
+# 对一个batch的数据处理
+def collate_fn(batch):
+    # 找出音频长度最长的
+    batch = sorted(batch, key=lambda sample: sample[0].shape[2], reverse=True)
+    channel_size = batch[0][0].shape[0]
+    height_size = batch[0][0].shape[1]
+    max_width_length = batch[0][0].shape[2]
+    batch_size = len(batch)
+    # 找出标签最长的
+    batch_temp = sorted(batch, key=lambda sample: len(sample[1]), reverse=True)
+    max_label_length = len(batch_temp[0][1])
+    # 以最大的长度创建0张量
+    inputs = np.zeros((batch_size, channel_size, height_size, max_width_length), dtype='float32')
+    labels = np.zeros((batch_size, max_label_length), dtype='int32')
+    input_lens = []
+    label_lens = []
+    for x in range(batch_size):
+        sample = batch[x]
+        tensor = sample[0]
+        target = sample[1]
+        width_length = tensor.shape[2]
+        label_length = target.shape[0]
+        # 将数据插入都0张量中，实现了padding
+        inputs[x, :, :, :width_length] = tensor[:, :, :]
+        labels[x, :label_length] = target[:]
+        input_lens.append(width_length)
+        label_lens.append(len(target))
+    input_lens = np.array(input_lens, dtype='int64')
+    label_lens = np.array(label_lens, dtype='int64')
+    return inputs, labels, input_lens, label_lens

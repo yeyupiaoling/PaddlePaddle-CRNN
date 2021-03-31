@@ -20,7 +20,7 @@ model.eval()
 
 
 def infer(path):
-    data = process(path, img_width=120, img_height=32)
+    data = process(path, img_height=32)
     data = data[np.newaxis, :]
     data = paddle.to_tensor(data, dtype='float32')
     # 执行识别

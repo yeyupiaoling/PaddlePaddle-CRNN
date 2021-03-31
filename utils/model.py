@@ -7,7 +7,7 @@ class Model(nn.Layer):
         super(Model, self).__init__()
         assert image_height % 32 == 0, 'image Height has to be a multiple of 32'
 
-        self.conv1 = nn.Conv2D(in_channels=1, out_channels=64, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2D(in_channels=channel, out_channels=64, kernel_size=3, stride=1, padding=1)
         self.relu1 = nn.ReLU()
         self.pool1 = nn.MaxPool2D(kernel_size=2, stride=2)
 

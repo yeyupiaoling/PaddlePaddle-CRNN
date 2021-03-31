@@ -5,6 +5,7 @@ from datetime import datetime
 from utils.model import Model
 from utils.decoder import ctc_greedy_decoder, label_to_string, cer
 from paddle.io import DataLoader
+from utils.data import collate_fn
 from utils.data import CustomDataset
 from visualdl import LogWriter
 
@@ -16,20 +17,20 @@ save_model = 'models/'
 batch_size = 16
 pretrained_model = None
 num_epoch = 1000
-learning_rate = 1e-2
+learning_rate = 1e-3
 writer = LogWriter(logdir='log')
 
 
 def train():
     # 获取训练数据
-    train_dataset = CustomDataset(train_data_list_path, voc_path, img_width=250, img_height=32, max_label_length=80)
-    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+    train_dataset = CustomDataset(train_data_list_path, voc_path, img_height=32)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=True)
     # 获取测试数据
-    test_dataset = CustomDataset(test_data_list_path, voc_path, img_width=250, img_height=32, max_label_length=80, is_data_enhance=False)
-    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size)
+    test_dataset = CustomDataset(test_data_list_path, voc_path, img_height=32, is_data_enhance=False)
+    test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, collate_fn=collate_fn)
     # 获取模型
-    model = Model(train_dataset.vocabulary, train_dataset.img_height)
-    paddle.summary(model, input_size=(batch_size, 1, train_dataset.img_height, train_dataset.img_width))
+    model = Model(train_dataset.vocabulary, image_height=train_dataset.img_height, channel=1)
+    paddle.summary(model, input_size=(batch_size, 1, train_dataset.img_height, 500))
     # 设置优化方法
     boundaries = [10, 20, 50]
     lr = [0.1 ** l * learning_rate for l in range(len(boundaries) + 1)]
@@ -41,6 +42,7 @@ def train():
     if pretrained_model is not None:
         model.set_state_dict(paddle.load(os.path.join(pretrained_model, 'model.pdparams')))
         optimizer.set_state_dict(paddle.load(os.path.join(pretrained_model, 'optimizer.pdopt')))
+
     train_step = 0
     test_step = 0
     # 开始训练
@@ -48,8 +50,8 @@ def train():
         for batch_id, (inputs, labels, input_lengths, label_lengths) in enumerate(train_loader()):
             out = model(inputs)
             # 计算损失
-            # input_lengths = input_lengths // 2 + 12
-            input_lengths = paddle.full(shape=[batch_size], fill_value=out.shape[0], dtype='int64')
+            input_lengths = input_lengths // 4 + 1
+            # input_lengths = paddle.full(shape=[batch_size], fill_value=out.shape[0], dtype='int64')
             loss = ctc_loss(out, labels, input_lengths, label_lengths)
             loss.backward()
             optimizer.step()
