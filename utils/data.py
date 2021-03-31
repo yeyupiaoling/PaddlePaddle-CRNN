@@ -9,7 +9,7 @@ from paddle.io import Dataset
 def random_brightness(img):
     prob = np.random.uniform(0, 1)
     if prob < 0.5:
-        brightness_delta = 0.5
+        brightness_delta = 0.3
         delta = np.random.uniform(-brightness_delta, brightness_delta) + 1
         img = ImageEnhance.Brightness(img).enhance(delta)
     return img
@@ -19,7 +19,7 @@ def random_brightness(img):
 def random_contrast(img):
     prob = np.random.uniform(0, 1)
     if prob < 0.5:
-        contrast_delta = 0.5
+        contrast_delta = 0.3
         delta = np.random.uniform(-contrast_delta, contrast_delta) + 1
         img = ImageEnhance.Contrast(img).enhance(delta)
     return img
@@ -29,7 +29,7 @@ def random_contrast(img):
 def random_saturation(img):
     prob = np.random.uniform(0, 1)
     if prob < 0.5:
-        saturation_delta = 0.5
+        saturation_delta = 0.3
         delta = np.random.uniform(-saturation_delta, saturation_delta) + 1
         img = ImageEnhance.Color(img).enhance(delta)
     return img
@@ -95,7 +95,7 @@ def process(path, img_height, is_data_enhance=True):
     # 转换成CHW
     image = image[np.newaxis, :]
     # 归一化
-    image = (image - 128) / 128
+    image = image / 255.
     return image
 
 

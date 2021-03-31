@@ -29,7 +29,7 @@ class Model(nn.Layer):
 
         self.conv6 = nn.Conv2D(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1)
         self.relu6 = nn.ReLU()
-        self.pool6 = nn.MaxPool2D(kernel_size=(2,2), stride=(2, 1), padding=(0, 1))
+        self.pool6 = nn.MaxPool2D(kernel_size=(2, 2), stride=(2, 1), padding=(0, 1))
 
         self.conv7 = nn.Conv2D(in_channels=512, out_channels=512, kernel_size=2, stride=1, padding=0)
         self.relu7 = nn.ReLU()

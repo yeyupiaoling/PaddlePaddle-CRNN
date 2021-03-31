@@ -32,10 +32,12 @@ def train():
     model = Model(train_dataset.vocabulary, image_height=train_dataset.img_height, channel=1)
     paddle.summary(model, input_size=(batch_size, 1, train_dataset.img_height, 500))
     # 设置优化方法
-    boundaries = [10, 20, 50]
+    boundaries = [30, 100, 200]
     lr = [0.1 ** l * learning_rate for l in range(len(boundaries) + 1)]
     scheduler = paddle.optimizer.lr.PiecewiseDecay(boundaries=boundaries, values=lr, verbose=False)
-    optimizer = paddle.optimizer.Adam(parameters=model.parameters(), learning_rate=scheduler)
+    optimizer = paddle.optimizer.Adam(parameters=model.parameters(),
+                                      learning_rate=scheduler,
+                                      weight_decay=paddle.regularizer.L2Decay(1e-4))
     # 获取损失函数
     ctc_loss = paddle.nn.CTCLoss()
     # 加载预训练模型

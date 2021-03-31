@@ -34,5 +34,5 @@ def infer(path):
 
 
 if __name__ == '__main__':
-    image_path = 'dataset/train_data/0aw2.png'
+    image_path = 'dataset/images/1617176730248_2gmnt93e.jpg'
     infer(image_path)

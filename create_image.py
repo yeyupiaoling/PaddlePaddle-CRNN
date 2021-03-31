@@ -28,7 +28,7 @@ def main(size=(200, 100), characterNumber=6, bgcolor=(255, 255, 255)):
     # 生成并计算随机字符串的宽度和高度
     text = selectedCharacters(characterNumber)
     print(text)
-    font = ImageFont.truetype("symbol.ttf", 40)
+    font = ImageFont.truetype("dataset/simsun.ttc", 40)
     width, height = draw01.textsize(text, font)
     if width + 2 * characterNumber > size[0] or height > size[1]:
         print('尺寸不合法')
