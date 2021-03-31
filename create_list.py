@@ -3,8 +3,6 @@ import os
 import cv2
 from tqdm import tqdm
 
-from utils.langconv import Converter
-
 
 def Q2B(uchar):
     """单个字符 全角转半角"""
@@ -24,26 +22,6 @@ def str_Q2B(ustring):
     return "".join([Q2B(uchar) for uchar in ustring])
 
 
-def modify_ch(label):
-    # 全角 -> 半角
-    # label = str_Q2B(label)
-    # 繁体 -> 简体
-    # label = Converter("zh-hans").convert(label)
-
-    # 大写 -> 小写
-    # label = label.lower()
-
-    # 删除空格
-    label = label.replace('　', '').replace(' ', '')
-
-    # 删除符号
-    # for ch in label:
-    #     if (not '\u4e00' <= ch <= '\u9fff') and (not ch.isalnum()):
-    #         label = label.replace(ch, '')
-
-    return label
-
-
 def create_list():
     with open('dataset/train_label.csv', 'r', encoding='gbk') as f:
         lines = f.readlines()
@@ -56,7 +34,10 @@ def create_list():
         for i in tqdm(range(1, len(lines))):
             line = lines[i]
             path, label = str(line).replace('\n', '').split(',')
-            label = modify_ch(label)
+            # 删除空格
+            label = label.replace('　', '').replace(' ', '')
+            # 全角 -> 半角
+            label = str_Q2B(label)
             if max_label < len(label):
                 max_label = len(label)
             image_path = os.path.join('dataset/train_images', path).replace('\\', '/')
@@ -77,7 +58,10 @@ def create_list():
                 continue
             line = lines[i]
             path, label = str(line).replace('\n', '').split(',')
-            label = modify_ch(label)
+            # 删除空格
+            label = label.replace('　', '').replace(' ', '')
+            # 全角 -> 半角
+            label = str_Q2B(label)
             image_path = os.path.join('dataset/train_images', path).replace('\\', '/')
             # 写入图像路径和label，用Tab隔开
             f.write(image_path + '\t' + label + '\n')
