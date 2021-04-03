@@ -1,13 +1,15 @@
 # CRNN
 
 本项目是PaddlePaddle 2.0动态图实现的CRNN文字识别模型，可支持长短不一的图片输入。CRNN是一种端到端的识别模式，不需要通过分割图片即可完成图片中全部的文字识别。CRNN的结构主要是CNN+RNN+CTC，它们分别的作用是，使用深度CNN，对输入图像提取特征，得到特征图。使用双向RNN（BLSTM）对特征序列进行预测，对序列中的每个特征向量进行学习，并输出预测标签（真实值）分布。使用 CTC Loss，把从循环层获取的一系列标签分布转换成最终的标签序列。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/2021040311401668.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMzMjAwOTY3,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/2021040311401668.png)
 CRNN的结构如下，一张高为32的图片，宽度随意，一张图片经过多层卷积之后，高度就变成了1，经过`paddle.squeeze()`就去掉了高度，也就说从输入的图片`BCHW`经过卷积之后就成了`BCW`。然后把特征顺序从`BCW`改为`WBC`输入到RNN中，经过两次的RNN之后，模型的最终输入为`(W, B, Class_num)`。这恰好是CTCLoss函数的输入。
-![在这里插入图片描述](https://img-blog.csdnimg.cn/20210403114016276.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzMzMjAwOTY3,size_16,color_FFFFFF,t_70)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210403114016276.png)
 
 使用环境：
  - PaddlePaddle 2.0.1
  - Python 3.7
+ 
+ **在线运行一下：[https://aistudio.baidu.com/aistudio/projectdetail/1751953](https://aistudio.baidu.com/aistudio/projectdetail/1751953)**
 
 # 准备数据集
 
