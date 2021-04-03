@@ -18,11 +18,11 @@ voc_path = 'dataset/vocabulary.txt'
 # 模型保存的路径
 save_model = 'models/'
 # 每一批数据大小
-batch_size = 16
+batch_size = 32
 # 预训练模型路径
 pretrained_model = None
 # 训练轮数
-num_epoch = 1000
+num_epoch = 100
 # 初始学习率大小
 learning_rate = 1e-3
 # 日志记录噐
