@@ -6,6 +6,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 # 验证码图片文字的字符集
 characters = 'abcdefghijklmnopqrstuvwxyx0123456789'
+font_path = "dataset/simsun.ttc"
 
 
 def selectedCharacters(length):
@@ -28,7 +29,7 @@ def main(size=(200, 100), characterNumber=6, bgcolor=(255, 255, 255)):
     # 生成并计算随机字符串的宽度和高度
     text = selectedCharacters(characterNumber)
     print(text)
-    font = ImageFont.truetype("dataset/simsun.ttc", 40)
+    font = ImageFont.truetype(font_path, 40)
     width, height = draw01.textsize(text, font)
     if width + 2 * characterNumber > size[0] or height > size[1]:
         print('尺寸不合法')

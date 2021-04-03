@@ -35,9 +35,9 @@ class Model(nn.Layer):
         self.relu7 = nn.ReLU()
         self.bn7 = nn.BatchNorm2D(512)
 
-        self.gru1 = nn.LSTM(input_size=512, hidden_size=256, direction='bidirectional')
+        self.lstm1 = nn.LSTM(input_size=512, hidden_size=256, direction='bidirectional')
         self.fc = nn.Linear(in_features=512, out_features=256)
-        self.gru2 = nn.LSTM(input_size=256, hidden_size=256, direction='bidirectional')
+        self.lstm2 = nn.LSTM(input_size=256, hidden_size=256, direction='bidirectional')
 
         self.output = nn.Linear(in_features=512, out_features=len(vocabulary))
 
@@ -57,12 +57,12 @@ class Model(nn.Layer):
         conv = paddle.squeeze(conv, axis=2)
 
         x = paddle.transpose(conv, perm=[2, 0, 1])
-        y, (h, c) = self.gru1(x)
+        y, (h, c) = self.lstm1(x)
         t, b, h = y.shape
         x = paddle.reshape(y, shape=(t * b, h))
         x = self.fc(x)
         x = paddle.reshape(x, shape=(t, b, -1))
-        y, (h, c) = self.gru2(x)
+        y, (h, c) = self.lstm2(x)
         t, b, h = y.shape
         x = paddle.reshape(y, shape=(t * b, h))
         x = self.output(x)

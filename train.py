@@ -9,15 +9,23 @@ from utils.data import collate_fn
 from utils.data import CustomDataset
 from visualdl import LogWriter
 
-# 训练参数
+# 训练数据列表路径
 train_data_list_path = 'dataset/train_list.txt'
+# 测试数据列表路径
 test_data_list_path = 'dataset/test_list.txt'
+# 词汇表路径
 voc_path = 'dataset/vocabulary.txt'
+# 模型保存的路径
 save_model = 'models/'
+# 每一批数据大小
 batch_size = 16
+# 预训练模型路径
 pretrained_model = None
+# 训练轮数
 num_epoch = 1000
+# 初始学习率大小
 learning_rate = 1e-3
+# 日志记录噐
 writer = LogWriter(logdir='log')
 
 
